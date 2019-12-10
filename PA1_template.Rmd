@@ -8,32 +8,45 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r}
+**Loading the library needed**
+
+```{r loading, echo = T, results="hide", message=F, warning=F}
 library(dplyr)
 library(ggplot2)
+```
 
+**Extract and read the data**
+
+```{r}
 unzip("activity.zip")
 
 activity <- read.csv("activity.csv", stringsAsFactors = FALSE)
 
-activity$date <- as.Date(activity$date)
+activity$date <- as.Date(activity$date) #convert to 'date' format
 ```
 
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+**Sum of steps, grouped by date**
+
+```{r, message=F, warning=FALSE}
 activity_perday <- activity %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps))
+```
 
+**Plot a histogram of mean total number of steps taken per day**
+
+```{r}
 activity_perday %>%
   ggplot(aes(x=totalsteps)) +
   geom_histogram()
 ```
 
-
 ## What is the average daily activity pattern?
+
+**Calculate the mean and median of steps taken per day**
 
 ```{r}
 mean_median_perday <- activity %>%
@@ -42,23 +55,42 @@ mean_median_perday <- activity %>%
   summarize(mean = mean(totalsteps),
             median = median(totalsteps))
 
+```
+
+**Calculate the mean of steps based on certain interval**
+
+```{r}
 groupedbyinterval <- activity %>%
   group_by(interval) %>%
   summarize(mean = mean(steps, na.rm = TRUE))
+```
 
+**Plot a line plot of mean of steps based on certain interval**
+
+```{r, message=FALSE, warning=FALSE}
 groupedbyinterval %>%
   ggplot(aes(x=interval, y=mean)) + 
   geom_line()
+```
 
+**Finding the maximum interval and mean of steps**
+
+```{r}
 groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),]
 ```
 
 
 ## Imputing missing values
 
+**Calculate the sum of missing datas**
+
 ```{r}
 (totalna = sum(is.na(activity$steps)))
+```
 
+**Impute the missing steps datas using the mean of the related intervals**
+
+```{r}
 activity_imp <- activity #copying the whole dataset
 activity_imp$steps_imp <- activity_imp$steps #copy original steps to new column
 
@@ -67,15 +99,27 @@ for (x in 1:length(activity_imp$steps_imp)){
       activity_imp$steps_imp[x] <- round(groupedbyinterval$mean[which(groupedbyinterval$interval == activity_imp$interval[x])])
     }
 }
+```
 
+**Calculate the sum of steps per day using imputed values from code chunk before**
+
+```{r}
 activity_imp_perday <- activity_imp %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps_imp))
+```
 
+**Plot a histogram of mean total number of steps taken per day using the imputed datas**
+
+```{r}
 activity_imp_perday %>%
   ggplot(aes(x=totalsteps)) +
   geom_histogram()
+```
 
+****Calculate the mean and median of steps taken per day using the imputed datas**
+
+```{r}
 mean_median_imp_perday <- activity_imp %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps_imp, na.rm = TRUE)) %>%
@@ -86,6 +130,8 @@ mean_median_imp_perday <- activity_imp %>%
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+**Calculate the mean of steps taken, grouped by Weekend or Weekday**
+
 ```{r}
 activity_imp$dayend <- ifelse(weekdays(activity_imp$date) == "Saturday" | weekdays(activity_imp$date) == "Sunday", 
                               "Weekend", 
@@ -95,9 +141,13 @@ activity_imp_grouped_dayend <- activity_imp %>%
   group_by(dayend, interval) %>%
   summarize(mean = mean(steps_imp, na.rm = TRUE))
 
+```
+
+**Plot a line plot of mean of steps based on certain interval using the imputed datas, grouped by Weekend or Weekday**
+
+```{r}
 activity_imp_grouped_dayend %>%
   ggplot(aes(x=interval, y=mean)) +
   geom_line() +
   facet_wrap(~dayend)
 ```
-
