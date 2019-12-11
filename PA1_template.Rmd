@@ -31,14 +31,14 @@ activity$date <- as.Date(activity$date) #convert to 'date' format
 **Sum of steps, grouped by date**
 
 ```{r, message=F, warning=FALSE}
-activity_perday <- activity %>%
+(activity_perday <- activity %>%
   group_by(date) %>%
-  summarize(totalsteps = sum(steps))
+  summarize(totalsteps = sum(steps)))
 ```
 
-**Plot a histogram of mean total number of steps taken per day**
+**Plot a histogram of mean total number of steps taken each day**
 
-```{r}
+```{r, message=F, warning=FALSE}
 activity_perday %>%
   ggplot(aes(x=totalsteps)) +
   geom_histogram()
@@ -46,26 +46,26 @@ activity_perday %>%
 
 ## What is the average daily activity pattern?
 
-**Calculate the mean and median of steps taken per day**
+**Calculate the mean and median of steps taken each day**
 
 ```{r}
-mean_median_perday <- activity %>%
+(mean_median_perday <- activity %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps, na.rm = TRUE)) %>%
   summarize(mean = mean(totalsteps),
-            median = median(totalsteps))
+            median = median(totalsteps)))
 
 ```
 
-**Calculate the mean of steps based on certain interval**
+**Calculate the mean of steps based on certain intervals**
 
 ```{r}
-groupedbyinterval <- activity %>%
+(groupedbyinterval <- activity %>%
   group_by(interval) %>%
-  summarize(mean = mean(steps, na.rm = TRUE))
+  summarize(mean = mean(steps, na.rm = TRUE)))
 ```
 
-**Plot a line plot of mean of steps based on certain interval**
+**Plot a line plot of mean of steps based on certain intervals**
 
 ```{r, message=FALSE, warning=FALSE}
 groupedbyinterval %>%
@@ -76,19 +76,19 @@ groupedbyinterval %>%
 **Finding the maximum interval and mean of steps**
 
 ```{r}
-groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),]
+(groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),])
 ```
 
 
 ## Imputing missing values
 
-**Calculate the sum of missing datas**
+**Calculate the sum of missing values**
 
 ```{r}
 (totalna = sum(is.na(activity$steps)))
 ```
 
-**Impute the missing steps datas using the mean of the related intervals**
+**Impute the missing steps values using the mean of the related intervals**
 
 ```{r}
 activity_imp <- activity #copying the whole dataset
@@ -101,30 +101,30 @@ for (x in 1:length(activity_imp$steps_imp)){
 }
 ```
 
-**Calculate the sum of steps per day using imputed values from code chunk before**
+**Calculate the sum of steps per day using imputed values from the previous code chunk**
 
 ```{r}
-activity_imp_perday <- activity_imp %>%
+(activity_imp_perday <- activity_imp %>%
   group_by(date) %>%
-  summarize(totalsteps = sum(steps_imp))
+  summarize(totalsteps = sum(steps_imp)))
 ```
 
-**Plot a histogram of mean total number of steps taken per day using the imputed datas**
+**Plot a histogram of mean total number of steps taken per day using the imputed values**
 
-```{r}
+```{r, message=F, warning=FALSE}
 activity_imp_perday %>%
   ggplot(aes(x=totalsteps)) +
   geom_histogram()
 ```
 
-****Calculate the mean and median of steps taken per day using the imputed datas**
+**Calculate the mean and median of steps taken per day using the imputed values**
 
-```{r}
-mean_median_imp_perday <- activity_imp %>%
+```{r, message=F, warning=FALSE}
+(mean_median_imp_perday <- activity_imp %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps_imp, na.rm = TRUE)) %>%
   summarize(mean = mean(totalsteps),
-            median = median(totalsteps))
+            median = median(totalsteps)))
 ```
 
 
@@ -137,13 +137,13 @@ activity_imp$dayend <- ifelse(weekdays(activity_imp$date) == "Saturday" | weekda
                               "Weekend", 
                               "Weekday")
 
-activity_imp_grouped_dayend <- activity_imp %>%
+(activity_imp_grouped_dayend <- activity_imp %>%
   group_by(dayend, interval) %>%
-  summarize(mean = mean(steps_imp, na.rm = TRUE))
+  summarize(mean = mean(steps_imp, na.rm = TRUE)))
 
 ```
 
-**Plot a line plot of mean of steps based on certain interval using the imputed datas, grouped by Weekend or Weekday**
+**Plot a line plot of mean of steps based on certain interval using the imputed values, grouped by Weekend or Weekday**
 
 ```{r}
 activity_imp_grouped_dayend %>%

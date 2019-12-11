@@ -34,12 +34,29 @@ activity$date <- as.Date(activity$date) #convert to 'date' format
 
 
 ```r
-activity_perday <- activity %>%
+(activity_perday <- activity %>%
   group_by(date) %>%
-  summarize(totalsteps = sum(steps))
+  summarize(totalsteps = sum(steps)))
 ```
 
-**Plot a histogram of mean total number of steps taken per day**
+```
+## # A tibble: 61 x 2
+##    date       totalsteps
+##    <date>          <int>
+##  1 2012-10-01         NA
+##  2 2012-10-02        126
+##  3 2012-10-03      11352
+##  4 2012-10-04      12116
+##  5 2012-10-05      13294
+##  6 2012-10-06      15420
+##  7 2012-10-07      11015
+##  8 2012-10-08         NA
+##  9 2012-10-09      12811
+## 10 2012-10-10       9900
+## # ... with 51 more rows
+```
+
+**Plot a histogram of mean total number of steps taken each day**
 
 
 ```r
@@ -48,39 +65,55 @@ activity_perday %>%
   geom_histogram()
 ```
 
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-```
-## Warning: Removed 8 rows containing non-finite values (stat_bin).
-```
-
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ## What is the average daily activity pattern?
 
-**Calculate the mean and median of steps taken per day**
+**Calculate the mean and median of steps taken each day**
 
 
 ```r
-mean_median_perday <- activity %>%
+(mean_median_perday <- activity %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps, na.rm = TRUE)) %>%
   summarize(mean = mean(totalsteps),
-            median = median(totalsteps))
+            median = median(totalsteps)))
 ```
 
-**Calculate the mean of steps based on certain interval**
+```
+## # A tibble: 1 x 2
+##    mean median
+##   <dbl>  <int>
+## 1 9354.  10395
+```
+
+**Calculate the mean of steps based on certain intervals**
 
 
 ```r
-groupedbyinterval <- activity %>%
+(groupedbyinterval <- activity %>%
   group_by(interval) %>%
-  summarize(mean = mean(steps, na.rm = TRUE))
+  summarize(mean = mean(steps, na.rm = TRUE)))
 ```
 
-**Plot a line plot of mean of steps based on certain interval**
+```
+## # A tibble: 288 x 2
+##    interval   mean
+##       <int>  <dbl>
+##  1        0 1.72  
+##  2        5 0.340 
+##  3       10 0.132 
+##  4       15 0.151 
+##  5       20 0.0755
+##  6       25 2.09  
+##  7       30 0.528 
+##  8       35 0.868 
+##  9       40 0     
+## 10       45 1.47  
+## # ... with 278 more rows
+```
+
+**Plot a line plot of mean of steps based on certain intervals**
 
 
 ```r
@@ -95,7 +128,7 @@ groupedbyinterval %>%
 
 
 ```r
-groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),]
+(groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),])
 ```
 
 ```
@@ -108,7 +141,7 @@ groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),]
 
 ## Imputing missing values
 
-**Calculate the sum of missing datas**
+**Calculate the sum of missing values**
 
 
 ```r
@@ -119,7 +152,7 @@ groupedbyinterval[which(groupedbyinterval$mean == max(groupedbyinterval$mean)),]
 ## [1] 2304
 ```
 
-**Impute the missing steps datas using the mean of the related intervals**
+**Impute the missing steps values using the mean of the related intervals**
 
 
 ```r
@@ -133,16 +166,33 @@ for (x in 1:length(activity_imp$steps_imp)){
 }
 ```
 
-**Calculate the sum of steps per day using imputed values from code chunk before**
+**Calculate the sum of steps per day using imputed values from the previous code chunk**
 
 
 ```r
-activity_imp_perday <- activity_imp %>%
+(activity_imp_perday <- activity_imp %>%
   group_by(date) %>%
-  summarize(totalsteps = sum(steps_imp))
+  summarize(totalsteps = sum(steps_imp)))
 ```
 
-**Plot a histogram of mean total number of steps taken per day using the imputed datas**
+```
+## # A tibble: 61 x 2
+##    date       totalsteps
+##    <date>          <dbl>
+##  1 2012-10-01      10762
+##  2 2012-10-02        126
+##  3 2012-10-03      11352
+##  4 2012-10-04      12116
+##  5 2012-10-05      13294
+##  6 2012-10-06      15420
+##  7 2012-10-07      11015
+##  8 2012-10-08      10762
+##  9 2012-10-09      12811
+## 10 2012-10-10       9900
+## # ... with 51 more rows
+```
+
+**Plot a histogram of mean total number of steps taken per day using the imputed values**
 
 
 ```r
@@ -151,21 +201,24 @@ activity_imp_perday %>%
   geom_histogram()
 ```
 
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
 ![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
-****Calculate the mean and median of steps taken per day using the imputed datas**
+**Calculate the mean and median of steps taken per day using the imputed values**
 
 
 ```r
-mean_median_imp_perday <- activity_imp %>%
+(mean_median_imp_perday <- activity_imp %>%
   group_by(date) %>%
   summarize(totalsteps = sum(steps_imp, na.rm = TRUE)) %>%
   summarize(mean = mean(totalsteps),
-            median = median(totalsteps))
+            median = median(totalsteps)))
+```
+
+```
+## # A tibble: 1 x 2
+##     mean median
+##    <dbl>  <dbl>
+## 1 10766.  10762
 ```
 
 
@@ -179,12 +232,30 @@ activity_imp$dayend <- ifelse(weekdays(activity_imp$date) == "Saturday" | weekda
                               "Weekend", 
                               "Weekday")
 
-activity_imp_grouped_dayend <- activity_imp %>%
+(activity_imp_grouped_dayend <- activity_imp %>%
   group_by(dayend, interval) %>%
-  summarize(mean = mean(steps_imp, na.rm = TRUE))
+  summarize(mean = mean(steps_imp, na.rm = TRUE)))
 ```
 
-**Plot a line plot of mean of steps based on certain interval using the imputed datas, grouped by Weekend or Weekday**
+```
+## # A tibble: 576 x 3
+## # Groups:   dayend [2]
+##    dayend  interval   mean
+##    <chr>      <int>  <dbl>
+##  1 Weekday        0 2.29  
+##  2 Weekday        5 0.4   
+##  3 Weekday       10 0.156 
+##  4 Weekday       15 0.178 
+##  5 Weekday       20 0.0889
+##  6 Weekday       25 1.58  
+##  7 Weekday       30 0.756 
+##  8 Weekday       35 1.16  
+##  9 Weekday       40 0     
+## 10 Weekday       45 1.73  
+## # ... with 566 more rows
+```
+
+**Plot a line plot of mean of steps based on certain interval using the imputed values, grouped by Weekend or Weekday**
 
 
 ```r
